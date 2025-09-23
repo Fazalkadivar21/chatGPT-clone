@@ -22,8 +22,8 @@ jobs:
           node-version: '20' # or your project version
 
       # Step 3: Install dependencies
-      - name: Install dependencies
-        run: npm install
+      #- name: Install dependencies
+        #run: npm install
 
       # Step 4: Set environment variables
       - name: Set environment variables
