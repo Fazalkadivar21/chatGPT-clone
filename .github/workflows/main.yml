@@ -1,0 +1,39 @@
+name: Ping Endpoints
+
+# Run on a schedule every 10 minutes
+on:
+  schedule:
+    - cron: '*/10 * * * *' # every 10 minutes
+  workflow_dispatch: # allows manual triggering
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repo
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20' # or your project version
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Step 4: Set environment variables
+      - name: Set environment variables
+        env:
+          ENDPOINT_1: ${{ secrets.ENDPOINT_1 }}
+          ENDPOINT_2: ${{ secrets.ENDPOINT_2 }}
+        run: |
+          echo "ENDPOINT_1=$ENDPOINT_1" >> $GITHUB_ENV
+          echo "ENDPOINT_2=$ENDPOINT_2" >> $GITHUB_ENV
+
+      # Step 5: Run the worker
+      - name: Run worker
+        run: node worker.js
