@@ -9,10 +9,15 @@ export const deleteMessages = async (chatId: string)=>{
 }
 
 export const saveMessage = async (userId:string,chatId:string, content:string,sender: string)=>{
-    await Message.create({
+    const message = await Message.create({
         user:userId,
         sender,
         content,
         chat: chatId
     })
+    return {id:message._id,user:message.user,chat:message.chat,text:message.content}
+}
+
+export const getMesages = async(chatId:string,userId:string)=>{
+    return await Message.find({chat:chatId,user:userId}).sort({ createdAt: -1 }).limit(20).lean().then(messages => messages.reverse())
 }

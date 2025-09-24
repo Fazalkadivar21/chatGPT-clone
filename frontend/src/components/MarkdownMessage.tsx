@@ -2,8 +2,8 @@ import { useEffect, useRef } from "react";
 import DOMPurify from "dompurify";
 import { marked } from "marked";
 import hljs from "highlight.js";
-import "highlight.js/styles/atom-one-dark.css"; // highlight.js theme
-import "github-markdown-css/github-markdown.css"; // optional: for nice markdown styles
+import "highlight.js/styles/atom-one-dark.css";
+import "github-markdown-css/github-markdown.css";
 
 type Props = { content: string };
 

@@ -16,7 +16,7 @@ interface User {
 export default function Sidebar() {
   const [user, setUser] = useState<User | null>(null);
 
-  const { chats, activeChatId, setChats, addChat, setActiveChat } =
+  const { chats, activeChatId, setChats, setActiveChat } =
     useChatStore();
 
   const getChats = async () => {

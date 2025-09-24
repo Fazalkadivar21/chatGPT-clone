@@ -1,10 +1,11 @@
 import { Server } from "socket.io";
 import { Server as HttpServer } from "http";
-import { genrateAnswer } from "./ai.service";
+import { genrateAnswer, genrateVector } from "./ai.service";
 import { Message } from "../models/message.model";
 import jwt from "jsonwebtoken";
-import { saveMessage } from "./message.service";
+import { getMesages, saveMessage } from "./message.service";
 import { updateName } from "./chat.service";
+import { createMemory, queryMemory } from "./vector.service";
 
 export const initSocket = (server: HttpServer) => {
   const io = new Server(server, {
@@ -41,16 +42,85 @@ export const initSocket = (server: HttpServer) => {
 
     socket.on("send", async (data) => {
       const { content, room } = data;
-      saveMessage(socket.data.user.id, room, content, "user");
-      const ans = await genrateAnswer(content);
-      saveMessage(socket.data.user.id, room, ans!, "model");
+      const question = await saveMessage(
+        socket.data.user.id,
+        room,
+        content,
+        "user"
+      );
+      const qvector = await genrateVector(content);
+      if (qvector) {
+        await createMemory({
+          vectors: qvector,
+          messageId: question.id.toString(),
+          metadata: {
+            text: question.text,
+            user: question.user!.toString(),
+            chat: question.chat!.toString(),
+          },
+        });
+      }
+
+      const [memory, chatHistory] = await Promise.all([
+        await queryMemory({
+          queryVector: qvector!,
+          limit: 5,
+          metadata: {
+            user: socket.data.user.id,
+            chat: room
+          },
+        }),
+
+        await getMesages(room, socket.data.user.id),
+      ]);
+
+      const stm = chatHistory.map((item) => {
+        return {
+          role: item.sender,
+          parts: [{ text: item.content }],
+        };
+      });
+
+      const ltm = [
+        {
+          role: "user",
+          parts: [
+            {
+              text: `
+                      these are some previous messages from the chat, use them to generate a response
+                      ${memory.map((item) => item.metadata.text).join("\n")}
+                      `,
+            },
+          ],
+        },
+      ];
+
+      const ans = await genrateAnswer([...ltm, ...stm]);
+      const answer = await saveMessage(
+        socket.data.user.id,
+        room,
+        ans!,
+        "model"
+      );
+      const avector = await genrateVector(content);
+      if (avector) {
+        await createMemory({
+          vectors: avector,
+          messageId: answer.id.toString(),
+          metadata: {
+            text: answer.text,
+            user: answer.user!.toString(),
+            chat: answer.chat!.toString(),
+          },
+        });
+      }
       io.to(room).emit("receive", ans);
     });
 
     socket.on("change", async (data) => {
       const { room } = data;
-      await updateName(socket.data.user.id,room)
-      io.to(room).emit("update")
+      await updateName(socket.data.user.id, room);
+      io.to(room).emit("update");
     });
 
     socket.on("leave", ({ room }) => {
