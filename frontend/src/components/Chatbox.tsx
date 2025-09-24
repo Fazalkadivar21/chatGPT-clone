@@ -117,6 +117,9 @@ export default function Chatbox() {
       room = data.chat._id;
       setActiveChat(room);
       socket.emit("join", { room });
+      setTimeout(() => {
+        socket.emit("change", { room });
+      }, 1500);
     }
 
     socket.emit("send", { room, content: input });

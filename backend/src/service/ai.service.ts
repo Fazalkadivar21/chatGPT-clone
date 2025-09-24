@@ -17,7 +17,7 @@ export async function genrateAnswer(content:string) {
 export async function renameChat(messages:Array<string>){
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
-    contents: `hey analys these messages and give a title to the chat no extra words just title messages : ${messages}`,
+    contents: `Analyze the following messages and generate a short, clear, and descriptive title for the chat (no extra words): ${messages}`,
   });
 
   return response.text

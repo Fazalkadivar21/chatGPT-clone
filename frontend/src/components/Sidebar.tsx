@@ -38,8 +38,7 @@ export default function Sidebar() {
   }, [activeChatId]);
 
   const createChat = async () => {
-    const { data } = await api.post(`/chats/create`);
-    addChat(data.chat);
+    setActiveChat("")
   };
 
   const logout = async () => {

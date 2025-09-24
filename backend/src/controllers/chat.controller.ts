@@ -18,7 +18,7 @@ export const createChat = async (req:Request,res:Response)=>{
 
 export const getChats = async (req:Request,res:Response)=>{
     try {
-        const chats = await Chat.find({user: req.user.id})
+        const chats = await Chat.find({ user: req.user.id }).sort({ createdAt: -1 });
         if(chats.length === 0) return res.status(200).json({message : "No chats yet.",chats})
             return res.status(200).json({message : "Chats fetched",chats})
     } catch (error) {

@@ -3,6 +3,7 @@ import DOMPurify from "dompurify";
 import { marked } from "marked";
 import hljs from "highlight.js";
 import "highlight.js/styles/atom-one-dark.css"; // highlight.js theme
+import "github-markdown-css/github-markdown.css"; // optional: for nice markdown styles
 
 type Props = { content: string };
 
@@ -12,12 +13,14 @@ export default function MarkdownMessage({ content }: Props) {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Configure marked once per render
+    // Configure marked for advanced markdown rendering
     marked.setOptions({
       gfm: true,
       breaks: true,
+      headerIds: true,
       mangle: false,
-      
+      smartLists: true,
+      smartypants: true,
       highlight: (code: string, lang?: string): string => {
         try {
           if (lang && hljs.getLanguage(lang)) {
@@ -30,19 +33,17 @@ export default function MarkdownMessage({ content }: Props) {
       },
     } as any);
 
-    // Parse markdown to HTML string
-    const rawHtml = marked.parse(content ?? "") as string;
+    // Convert markdown to HTML
+    const rawHtml = marked.parse(content ?? "");
 
-    // Sanitize the HTML (DOMPurify returns string, TS knows it)
-    const clean: string = DOMPurify.sanitize(rawHtml) as string;
+    // Sanitize the HTML
+    const cleanHtml = DOMPurify.sanitize(rawHtml as string);
 
-    // Inject into DOM
-    containerRef.current.innerHTML = clean;
+    // Inject sanitized HTML
+    containerRef.current.innerHTML = cleanHtml;
 
-    // Add copy buttons for each code block
-    const preEls = containerRef.current.querySelectorAll("pre");
-    preEls.forEach((pre) => {
-      // avoid duplicates
+    // Add copy buttons to code blocks
+    containerRef.current.querySelectorAll("pre").forEach((pre) => {
       if (pre.querySelector(".copy-btn")) return;
 
       pre.style.position = pre.style.position || "relative";
@@ -58,8 +59,10 @@ export default function MarkdownMessage({ content }: Props) {
         background: "#111827",
         color: "#fff",
         border: "none",
+        borderRadius: "4px",
         padding: "4px 8px",
         cursor: "pointer",
+        fontSize: "12px",
         opacity: "0",
         transition: "opacity 150ms",
         zIndex: "10",
@@ -70,7 +73,7 @@ export default function MarkdownMessage({ content }: Props) {
 
       btn.addEventListener("click", async () => {
         const codeEl = pre.querySelector("code");
-        const text = codeEl ? codeEl.textContent ?? "" : "";
+        const text = codeEl?.textContent ?? "";
         try {
           await navigator.clipboard.writeText(text);
           const old = btn.textContent;
@@ -85,17 +88,29 @@ export default function MarkdownMessage({ content }: Props) {
       pre.appendChild(btn);
     });
 
-    // highlight any remaining code blocks (fallback)
+    // Highlight remaining code blocks
     containerRef.current.querySelectorAll("pre code").forEach((block) => {
       hljs.highlightElement(block as HTMLElement);
     });
 
     return () => {
-      if (containerRef.current) {
-        containerRef.current.innerHTML = "";
-      }
+      if (containerRef.current) containerRef.current.innerHTML = "";
     };
   }, [content]);
 
-  return <div ref={containerRef} className="markdown-body prose max-w-none" />;
+  return (
+    <div
+      ref={containerRef}
+      className="markdown-body prose max-w-none break-words text-sm leading-relaxed"
+      style={{
+        background: "#1E1E2D", // subtle LLM chat-like background
+        color: "#E0E0E0",
+        padding: "12px 16px",
+        borderRadius: "8px",
+        fontFamily:
+          "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
+        overflowX: "auto",
+      }}
+    />
+  );
 }
