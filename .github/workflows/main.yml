@@ -1,0 +1,16 @@
+name: Ping URLs
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"  # every 10 minutes
+  workflow_dispatch:         # allows manual trigger too
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping first URL
+        run: curl -I https://chatgpt-clone-60ew.onrender.com
+
+      - name: Ping second URL
+        run: curl -I https://chatgpt-clone-backend-ehb9.onrender.com
