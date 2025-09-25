@@ -18,7 +18,7 @@ export default function Chatbox() {
   const [streamingMessage, setStreamingMessage] = useState<Message | null>(
     null
   );
-
+  useEffect(() => {setIsTyping(false)}, [activeChatId]);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const scrollToBottom = () => {
