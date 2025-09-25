@@ -92,6 +92,8 @@ export default function Register() {
           </button>
         </form>
 
+        <div>Already have an account? <a href="/login" className="text-indigo-600 hover:underline">Login</a></div>
+
         {message && (
           <p className="mt-4 text-center text-sm text-gray-700">{message}</p>
         )}
