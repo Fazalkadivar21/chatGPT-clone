@@ -61,30 +61,28 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="w-1/4 border-r-2 border-r-gray-300 flex flex-col items-center justify-between p-5 h-screen">
-      <div className="w-full flex items-center justify-center">
+    <div className="w-full border-r-2 border-gray-300 flex flex-col items-center justify-between p-3 sm:p-5 h-screen">
+      <div className="w-full flex items-center justify-center mb-4 sm:mb-0">
         <button
-          className="bg-black w-full text-white py-2 rounded-4xl"
+          className="bg-black w-full text-white py-2 sm:py-2.5 rounded-3xl sm:rounded-4xl text-sm sm:text-base"
           onClick={createChat}
         >
           New Chat
         </button>
       </div>
 
-      <div className="h-[83%] w-full overflow-y-auto mt-5">
-        <p className="mb-5">chats</p>
+      <div className="flex-1 w-full overflow-y-auto mt-3 sm:mt-5">
+        <p className="mb-2 sm:mb-5 font-semibold">Chats</p>
         {chats.length === 0 ? (
-          <div className="text-center text-gray-500 mt-4">No chats yet</div>
+          <div className="text-center text-gray-500 text-sm sm:text-base mt-2 sm:mt-4">No chats yet</div>
         ) : (
           chats.map((chat) => (
             <div
               key={chat._id}
-              className={`p-3 cursor-pointer rounded-lg mb-1
-              ${
-                activeChatId === chat._id
+              className={`p-2 sm:p-3 cursor-pointer rounded-lg mb-1 break-words
+                ${activeChatId === chat._id
                   ? "border border-dashed border-gray-400 bg-gray-50"
-                  : "hover:bg-gray-100"
-              }`}
+                  : "hover:bg-gray-100"} text-sm sm:text-base`}
               onClick={() => changeChat(chat._id)}
             >
               {chat.name}
@@ -93,18 +91,15 @@ export default function Sidebar() {
         )}
       </div>
 
-      {/* User island */}
-      <div className="flex items-center justify-start w-full border-2 border-black rounded-full p-3">
-        <div>
-          <img
-            className="h-10 object-cover rounded-full"
-            src="https://images.unsplash.com/photo-1658227387870-6b7d4d6ff031?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="userprofile"
-          />
-        </div>
-        <div className="flex items-center justify-between w-[80%] ml-4">
+      <div className="flex items-center justify-start w-full border-2 border-black rounded-full p-2 sm:p-3 mt-3 sm:mt-0">
+        <img
+          className="h-8 w-8 sm:h-10 sm:w-10 object-cover rounded-full"
+          src="https://images.unsplash.com/photo-1658227387870-6b7d4d6ff031?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          alt="userprofile"
+        />
+        <div className="flex items-center justify-between w-[75%] sm:w-[80%] ml-2 sm:ml-4 text-sm sm:text-base md:flex-col lg:flex-row">
           <div>{user?.username ?? "Guest"}</div>
-          <button className="text-red-500" onClick={logout}>
+          <button className="text-red-500 text-xs sm:text-sm" onClick={logout}>
             logout
           </button>
         </div>
