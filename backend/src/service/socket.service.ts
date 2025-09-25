@@ -1,11 +1,11 @@
 import { Server } from "socket.io";
 import { Server as HttpServer } from "http";
 import { genrateAnswer, genrateVector } from "./ai.service";
-import { Message } from "../models/message.model";
 import jwt from "jsonwebtoken";
-import { getMesages, saveMessage } from "./message.service";
+import { getMessages, saveMessage } from "./message.service";
 import { updateName } from "./chat.service";
 import { createMemory, queryMemory } from "./vector.service";
+import { getCachedMessages } from "./redis.service";
 
 export const initSocket = (server: HttpServer) => {
   const io = new Server(server, {
@@ -71,7 +71,7 @@ export const initSocket = (server: HttpServer) => {
           },
         }),
 
-        await getMesages(room, socket.data.user.id),
+        await getCachedMessages(room,socket.data.user.id)
       ]);
 
       const stm = chatHistory.map((item) => {
@@ -114,6 +114,7 @@ export const initSocket = (server: HttpServer) => {
           },
         });
       }
+
       io.to(room).emit("receive", ans);
     });
 
