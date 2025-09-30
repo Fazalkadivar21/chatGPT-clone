@@ -5,6 +5,8 @@ import dotenv from "dotenv"
 import connect from "./db";
 import http from "http"
 import { initSocket } from "./service/socket.service";
+import path from "path";
+
 
 connect()
 dotenv.config()
@@ -12,6 +14,9 @@ dotenv.config()
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(express.json());
+app.use(cors({ origin: "*" }));
+app.use(express.static(path.join(__dirname,"../public")))
 app.use(express.json());
 app.use(cookiePaser())
 app.use(cors({
@@ -34,6 +39,10 @@ app.use("/messages",messageRouter)
 const server = http.createServer(app);
 
 initSocket(server);
+
+app.get("*name",(req,res)=>{
+  res.sendFile(path.join(__dirname,"../public/index.html"))
+})
 
 server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
